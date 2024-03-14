@@ -22,8 +22,6 @@ class DbConnection {
     }
 
     public function insertReview($user_id, $product_id, $sanitizedReview){
-        // $sql = "INSERT INTO reviews (user_id, product_id, review) VALUES ($user_id, $product_id, $sanitizedReview)";
-        // $insertRow = $this->mysqli->query($sql);
         $stmt = $this->mysqli->prepare("INSERT INTO reviews (user_id, product_id, review) VALUES (?, ?, ?)");
         $stmt->bind_param('sss', $user_id, $product_id, $sanitizedReview);
       

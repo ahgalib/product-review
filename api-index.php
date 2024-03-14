@@ -1,38 +1,27 @@
 <?php
-header('Content-Type: application/json'); // Set response content type
+// Set response content type
+header('Content-Type: application/json'); 
 
-include_once 'config.php';
 include_once 'database/config.php';
 include_once 'review-controller.php';
 
-$data = json_decode(file_get_contents('php://input'), true); // Get data from request body
+// Get data from request body
+$data = json_decode(file_get_contents('php://input'), true);
 
-if (isset($data['submit'])) { // Check for submit key in request data
     $db = new DbConnection;
-    $review_logic = new ReviewController;
-
-    $review_logic->validation();
-
-    $errors = $review_logic->getErrors();
-
+    $reviewController = new ReviewController;
+    $errors = $reviewController->validateReview($data);
     if (empty($errors)) {
-        $user_id = htmlspecialchars($data['user_id']);
-        $product_id = htmlspecialchars($data['product_id']);
-        $sanitizedReview = htmlspecialchars($data['review']);
-
-        if ($db->insertReview($user_id, $product_id, $sanitizedReview)) {
-            $response = ['message' => 'Review submitted successfully!'];
-            echo json_encode($response);
+        $user_id = $data['user_id'];
+        $product_id = $data['product_id'];
+        $review = htmlspecialchars($data['review']);
+        if ($db->insertReview($user_id, $product_id, $review)) {
+            echo json_encode(['message' => 'Review submitted successfully']);
         } else {
-            $response = ['error' => 'Error submitting review'];
-            echo json_encode($response);
+            echo json_encode(['error' => 'Error submitting review']);
         }
     } else {
-        $response = ['errors' => $errors];
-        echo json_encode($response);
+        echo json_encode(['errors' => $errors]);
     }
-} else {
-    $response = ['error' => 'Invalid request'];
-    echo json_encode($response);
-}
+
         
